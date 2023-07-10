@@ -42,10 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
         add_button = findViewById(R.id.addButton);
 
-
-
-
-
         add_button.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, AddAssetActivity.class));
         });

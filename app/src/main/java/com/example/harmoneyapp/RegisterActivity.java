@@ -71,9 +71,9 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     private void createUser(View add_asset_number, View spinnersearch) {
-    String email = mail.getText().toString();
-    String password = password_register.getText().toString();
-    String passwordValid = password_register.getText().toString();
+        String email = mail.getText().toString();
+        String password = password_register.getText().toString();
+        String passwordValid = password_register.getText().toString();
 
     /*
         String add_asset_number = add_asset_number.getText().toString();
@@ -81,34 +81,33 @@ public class RegisterActivity extends AppCompatActivity {
 */
 
         if (TextUtils.isEmpty(email)){
-        mail.setError("E-Mail cannot be empty");
-        mail.requestFocus();
-    }else if (TextUtils.isEmpty(password)) {
-        password_register.setError("Passwort mus befüllt werden");
-        password_register.requestFocus();
-    }else if (password.equals(passwordValid)){
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-        @Override
-        public void onComplete(@NonNull Task<AuthResult> task) {
-            if(task.isSuccessful()) {
-                Toast.makeText(RegisterActivity.this, "Registrierung erfolgreich", Toast.LENGTH_SHORT).show();
+            mail.setError("E-Mail cannot be empty");
+            mail.requestFocus();
+        }else if (TextUtils.isEmpty(password)) {
+            password_register.setError("Passwort mus befüllt werden");
+            password_register.requestFocus();
+        }else if (password.equals(passwordValid)){
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()) {
+                        Toast.makeText(RegisterActivity.this, "Registrierung erfolgreich", Toast.LENGTH_SHORT).show();
 
-               userID = mAuth.getCurrentUser().getUid();
-               DocumentReference documentReference = firestore.collection("users").document(userID).collection("portfolio").document("asset_list");
-               Map<String,Object> user = new HashMap<>();
-                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                         Log.d("", "user is created for"+userID);
-                 }
-               });
+                        userID = mAuth.getCurrentUser().getUid();
+                        DocumentReference documentReference = firestore.collection("users").document(userID).collection("portfolio").document("asset_list");
+                        Map<String,Object> user = new HashMap<>();
+                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("", "user is created for"+userID);
+                            }
+                        });
 
-
-                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
-            } else {
-                Toast.makeText(RegisterActivity.this, "Registrieren Fehlgeschlagen, Passwörter müssen authentisch sein" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-        });
-    }}
+                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Registrieren Fehlgeschlagen, Passwörter müssen authentisch sein" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }}
 }

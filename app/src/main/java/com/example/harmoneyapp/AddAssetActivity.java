@@ -1,16 +1,11 @@
 package com.example.harmoneyapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -23,10 +18,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -70,26 +65,38 @@ public class AddAssetActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         add_portfolio_button.setOnClickListener(v -> {
-            String spinner_data = spinnerserchasset.getText().toString();
-            String add_asset_number_data = add_asset_number.getText().toString();
-
+            String selectedCryptoAsset = spinnerserchasset.getText().toString();
+            String amount = add_asset_number.getText().toString();
             userID = mAuth.getCurrentUser().getUid();
-            DocumentReference documentReference = firestore.collection("users").document(userID).collection("portfolio").document("asset_list");
-            Map<String,Object> user = new HashMap<>();
-            user.put(spinner_data, add_asset_number_data);
+            DocumentReference documentReference = firestore.collection("users")
+                    .document(userID)
+                    .collection("portfolio")
+                    .document("asset_list")
+                    .collection(selectedCryptoAsset).document();
 
-            documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-               @Override
+            /*
+            Map<String, Object> user = new HashMap<>();
+            user.put(selectedCryptoAsset, amount);
+            */
+
+            Map<String, CryptoAsset> cryptoAsset = new HashMap<>();
+            CryptoAsset asset = new CryptoAsset(selectedCryptoAsset, "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png", amount);
+
+            // cryptoAsset.put(selectedCryptoAsset, asset);
+            documentReference.set(asset).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
                 public void onSuccess(Void unused) {
-                    Log.d("", "user is created for"+userID);
+                    Log.d("", "user is created for" + userID);
                     startActivity(new Intent(AddAssetActivity.this, MainActivity.class));
                 }
             });
-           Toast.makeText(AddAssetActivity.this, spinner_data+add_asset_number_data, Toast.LENGTH_SHORT).show();
+
+
+            Toast.makeText(AddAssetActivity.this, selectedCryptoAsset + amount, Toast.LENGTH_SHORT).show();
         });
 
         button.setOnClickListener(v -> {
-           startActivity(new Intent(AddAssetActivity.this, MainActivity.class));
+            startActivity(new Intent(AddAssetActivity.this, MainActivity.class));
         });
 
         PriceViewModel viewModel = new ViewModelProvider(this).get(PriceViewModel.class);
@@ -117,7 +124,6 @@ public class AddAssetActivity extends AppCompatActivity {
         });
 
 
-
         spinnerserchasset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,7 +141,7 @@ public class AddAssetActivity extends AppCompatActivity {
                 ListView listView = dialog.findViewById(R.id.list_view);
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(AddAssetActivity.this,
-                        android.R.layout.simple_list_item_1,asset_spinner_list);
+                        android.R.layout.simple_list_item_1, asset_spinner_list);
 
                 listView.setAdapter(adapter);
 
